@@ -6,8 +6,15 @@
         v-bind:currentScore="currentScore"
         v-bind:activePlayer="activePlayer"
       />
-      <controllers v-on:newGame="handleNewGame" />
-      <dices />
+      <controllers
+        v-on:newGame="handleNewGame"
+        v-on:rollDice="handleRollDice"
+        v-on:holdScore="handleHoldScore"
+        v-bind:finalScore="finalScore"
+        v-on:changeFinalScore="changeFinalScore"
+        v-bind:isPlaying="isPlaying"
+      />
+      <dices v-bind:dices="dices" />
       <modal-rules
         v-bind:isOpenModal="isOpenModal"
         v-on:confirmRules="startNewGame"
@@ -28,9 +35,12 @@ export default {
     return {
       isPlaying: false,
       isOpenModal: false,
-      activePlayer: 1,
+      activePlayer: 0,
       scorePlayers: [14, 25],
-      currentScore: 20
+      currentScore: 20,
+      finalScore: 50,
+      ////////////////////////////////
+      dices: [1, 4]
     };
   },
   components: {
@@ -40,6 +50,12 @@ export default {
     ModalRules
   },
   methods: {
+    swapPlayer() {
+      this.activePlayer == 0
+        ? (this.activePlayer = 1)
+        : (this.activePlayer = 0);
+      this.currentScore = 0;
+    },
     handleNewGame() {
       this.isOpenModal = true;
     },
@@ -47,6 +63,61 @@ export default {
       this.isOpenModal = false;
       // console.log("start newgame");
       this.isPlaying = true;
+      this.dices = [6, 6];
+      this.scorePlayers = [0, 0];
+      this.currentScore = 0;
+    },
+    handleRollDice() {
+      if (this.isPlaying) {
+        // console.log("Roll");
+        var dice1 = Math.round(Math.random() * 5 + 1);
+        var dice2 = Math.round(Math.random() * 5 + 1);
+        this.dices = [dice1, dice2];
+        // check swap player : one of 2 == 1
+        if (dice1 == 1 || dice2 == 1) {
+          //swap player :
+          let currentPlayer = this.activePlayer;
+          setTimeout(() => {
+            alert(`${currentPlayer ? "Player 2" : "Player 1"} roll in 1`);
+          }, 100);
+
+          this.swapPlayer();
+        } else {
+          this.currentScore += dice1 + dice2;
+        }
+      } else {
+        alert("Click New Game !");
+      }
+    },
+    handleHoldScore() {
+      if (this.isPlaying) {
+        console.log(
+          "Hold",
+          this.currentScore,
+          this.activePlayer ? "Player 2" : "Player 1",
+          this.activePlayer
+        );
+        let currentPlayer = this.activePlayer;
+        // this.scorePlayers[currentPlayer] += this.currentScore; // khong dung dc nhu nay
+        this.$set(
+          this.scorePlayers,
+          currentPlayer,
+          this.scorePlayers[currentPlayer] + this.currentScore
+        );
+        //swapPlayer();
+        setTimeout(() => {
+          this.swapPlayer();
+        }, 100);
+      } else {
+        alert("Click New Game !");
+      }
+    },
+    changeFinalScore(data) {
+      // console.log("changeFinalScore", data);
+      if (!this.isPlaying) {
+        let val = parseInt(data.value);
+        this.finalScore = val;
+      }
     }
   }
 };

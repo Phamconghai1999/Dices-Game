@@ -5,6 +5,8 @@
         v-bind:scorePlayers="scorePlayers"
         v-bind:currentScore="currentScore"
         v-bind:activePlayer="activePlayer"
+        v-bind:isPlaying="isPlaying"
+        v-bind:checkWinner="checkWinner"
       />
       <controllers
         v-on:newGame="handleNewGame"
@@ -16,9 +18,10 @@
       />
       <dices v-bind:dices="dices" />
       <modal-rules
-        v-bind:isOpenModal="isOpenModal"
+        v-bind:isOpenModalRules="isOpenModalRules"
         v-on:confirmRules="startNewGame"
       />
+      <toast v-bind:showToast="showToast" v-bind:messageToast="messageToast" />
     </div>
   </div>
 </template>
@@ -28,26 +31,43 @@ import Players from "./components/Players.vue";
 import Controllers from "./components/Controllers.vue";
 import Dices from "./components/Dices.vue";
 import ModalRules from "./components/ModalRules.vue";
+import Toast from "./components/Toast.vue";
 
 export default {
   name: "app",
   data() {
     return {
       isPlaying: false,
-      isOpenModal: false,
+      isOpenModalRules: false,
       activePlayer: 0,
-      scorePlayers: [14, 25],
+      scorePlayers: [2, 8],
       currentScore: 20,
-      finalScore: 50,
+      finalScore: 30,
       ////////////////////////////////
-      dices: [1, 4]
+      dices: [1, 4],
+      //== Show notification
+      showToast: false,
+      messageToast: ""
     };
   },
   components: {
     Players,
     Controllers,
     Dices,
-    ModalRules
+    ModalRules,
+    Toast
+  },
+  computed: {
+    checkWinner: function() {
+      let { scorePlayers, finalScore } = this;
+      if (scorePlayers[0] >= finalScore || scorePlayers[1] >= finalScore) {
+        this.isPlaying = false;
+        // console.log("Winner: Player", this.activePlayer);
+        let Winner = this.activePlayer;
+        return { isWinner: true, Winner };
+      }
+      return { isWinner: false, Winner: null };
+    }
   },
   methods: {
     swapPlayer() {
@@ -56,11 +76,18 @@ export default {
         : (this.activePlayer = 0);
       this.currentScore = 0;
     },
+    notification(message) {
+      this.showToast = true;
+      this.messageToast = message;
+      setTimeout(() => {
+        this.showToast = false;
+      }, 3000);
+    },
     handleNewGame() {
-      this.isOpenModal = true;
+      this.isOpenModalRules = true;
     },
     startNewGame() {
-      this.isOpenModal = false;
+      this.isOpenModalRules = false;
       // console.log("start newgame");
       this.isPlaying = true;
       this.dices = [6, 6];
@@ -78,7 +105,9 @@ export default {
           //swap player :
           let currentPlayer = this.activePlayer;
           setTimeout(() => {
-            alert(`${currentPlayer ? "Player 2" : "Player 1"} roll in 1`);
+            this.notification(
+              `${currentPlayer ? "Player 2" : "Player 1"} roll in 1`
+            );
           }, 100);
 
           this.swapPlayer();
@@ -86,7 +115,7 @@ export default {
           this.currentScore += dice1 + dice2;
         }
       } else {
-        alert("Click New Game !");
+        this.notification("Click New Game First !!!");
       }
     },
     handleHoldScore() {
@@ -104,12 +133,12 @@ export default {
           currentPlayer,
           this.scorePlayers[currentPlayer] + this.currentScore
         );
-        //swapPlayer();
-        setTimeout(() => {
+        //check winner
+        if (this.checkWinner.isWinner == false) {
           this.swapPlayer();
-        }, 100);
+        }
       } else {
-        alert("Click New Game !");
+        this.notification("Click New Game First !!!");
       }
     },
     changeFinalScore(data) {

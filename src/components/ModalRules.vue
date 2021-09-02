@@ -1,12 +1,12 @@
 <template lang="">
-  <div class="wrapper-rules" v-bind:class="isOpenModalComputed">
+  <div class="wrapper-rules" v-bind:class="isOpenModalRulesComputed">
     <div class="rules">
-      <h3>Rule:</h3>
-      <p>
-        Lorem ipsum dolor sit amet, consectet dolore eu fugiat nulla pariatur et
-      </p>
-      <button class="btn btn-success" v-on:click="confirmRules">
-        Okey !
+      <h4>Luật chơi:</h4>
+      <p>1. Bấm RollDice để lắc xúc xắc</p>
+      <p>2. Nếu xúc xắc trúng ô điểm 1, bạn sẽ bị mất lượt</p>
+      <p>3. Bấm HOLD để giữ lại điểm và chuyển lượt chơi</p>
+      <button class="btn btn-primary" v-on:click="confirmRules">
+        Okey, Let's go !!
       </button>
     </div>
   </div>
@@ -15,15 +15,15 @@
 export default {
   name: "modal-rule",
   props: {
-    isOpenModal: {
+    isOpenModalRules: {
       Type: Boolean,
       default: false
     }
   },
   computed: {
-    isOpenModalComputed: function() {
+    isOpenModalRulesComputed: function() {
       return {
-        "open-modal": this.isOpenModal
+        "open-modal": this.isOpenModalRules
       };
     }
   },
@@ -64,12 +64,20 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%) scale(1.2);
   background: rgb(255, 227, 227);
-  text-align: center;
+  text-align: left;
   margin: 10px 10px;
   padding: 10px 10px;
   border: 1px solid rgb(116, 255, 111);
   border-radius: 13px;
-  font: 25px sans-serif;
+  font: 15px sans-serif;
   transition: all 0.3s ease;
+}
+.rules p {
+  padding: 1px 1px;
+  margin: 2px 2px;
+}
+.rules button {
+  position: relative;
+  margin: auto 50%;
 }
 </style>

@@ -13,6 +13,7 @@
     <input
       v-bind:value="finalScore"
       v-on:input="changeFinalScore"
+      v-bind:disabled="isPlaying"
       type="number"
       placeholder="Final score"
       class="final-score"
@@ -113,12 +114,15 @@ export default {
   transform: translateX(-50%);
   top: 520px;
   color: #555;
-  font-size: 18px;
+  font-size: 20px;
   font-family: "Lato";
+  font-weight: bold;
   text-align: center;
   padding: 10px;
   width: 160px;
   text-transform: uppercase;
+  border: 2px solid rgba(255, 140, 0, 0.516);
+  border-radius: 4px;
 }
 
 .final-score:focus {
